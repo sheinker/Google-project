@@ -1,8 +1,6 @@
 from collections import defaultdict
 from itertools import combinations
 
-
-
 sent1 = "Hello big and beautiful world"
 sent2 = "To be or not to be, This is the question"
 sent3 = "Be good to everyone, everywhere, everytime"
@@ -13,16 +11,75 @@ bad_chars = [';', ':', '!', "*", ","]
 data = defaultdict(set)
 
 
+def init_data():
+    for sentence in sent_dict:
+        res = [sentence[x:y] for x, y in combinations(range(len(sentence) + 1), r=2)]
+        for i in res:
+            for j in bad_chars:
+                i = i.replace(j, '')
+            if not i.startswith(" ") and not i.endswith(" "):
+                data[i].add(sent_dict[sentence])
 
-for sentence in sent_dict:
-    res = [sentence[x:y] for x, y in combinations(range(len(sentence) + 1), r=2)]
-    for i in res:
-        for j in bad_chars:
-            i = i.replace(j, '')
-        if not i.startswith(" ") and not i.endswith(" "):
-            data[i].add(sent_dict[sentence])
+
+def print_data():
+    for item in data:
+        print(f'{item}: {data[item]}')
 
 
-for item in data:
-    print(f'{item}: {data[item]}')
 
+
+def get_best_k_completions(prefix: str):
+    return List[AutoCompleteData]
+
+
+
+class AutoCompleteData:
+    def __init__(self, completed_sentence, source_text,offset, score):
+        self.completed_sentence = completed_sentence
+        self.source_text = source_text
+        self.offset = offset
+        self.score = score
+    # methods that you need to define by yourself
+
+
+def replace_char(self, word):
+    for char in word:
+        for i in range(32, 67):
+            if word.replace(char, chr(i)) in data.keys():
+                return i - 32
+    return -1
+
+
+def delete_Unnecessary_char(self, word):
+    for char in word:
+        if word.replace(char, "") in data.keys():
+          return word.index(char)
+    return -1
+
+
+def add_missed_char(self, word):
+    for char in word:
+        for i in range(32, 67):
+            if word.replace(char, char + chr(i)) in data.keys():
+                return i - 32
+    return -1
+
+
+def get_score(self, sentence):
+    sentence = sentence.split()
+    for word in sentence:
+        if self.replace_char(word) != -1:
+            index = self.replace_char(word)
+            if index < 6:
+                self.score -= (5 - index % 5)
+            else:
+                self.score -= 1
+        elif self.delete_Unnecessary_char(word) != -1 or self.add_missed_char(word) != -1:
+                index = self.delete_Unnecessary_char(word)
+                if index < 5:
+                    self.score -= (10 - index % 5)
+                else:
+                    self.score -= 2
+        else:
+            self.score += len(word) * 2
+        self.score += (sentence.size() - 1) * 2
