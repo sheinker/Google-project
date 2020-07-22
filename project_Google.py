@@ -10,7 +10,7 @@ sent5 = "Bee is making honey"
 sent6 = "We are learning in Beit - Yaakov"
 
 sent_dict = {sent1: 0, sent2: 1, sent3: 2, sent4: 3, sent5: 4, sent6: 5}
-bad_chars = [';', ':', '!', '*', ',', '$', "@" " "]
+bad_chars = [';', ':', '-', '!', '*', ',', '$', '@']
 
 data = defaultdict(set)
 best_sen = {}
@@ -46,7 +46,6 @@ def get_data_at_key(key):
 #     file.close()
 
 
-
 def get_five_best_sentences(prefix):
     best_sentences = get_data_at_key(prefix)
     if len(best_sentences) >= 5:
@@ -61,9 +60,6 @@ def get_five_best_sentences(prefix):
         a = set(sorted(best_sen, key=best_sen.get, reverse=True))
         a = set(best_sentences).union(a)
         return list(a)[:5]
-
-
-
 
 
 def get_best_k_completions(prefix):
@@ -93,53 +89,51 @@ def get_best_k_completions(prefix):
 def replace_char(word):
     for index, char in enumerate(word):
         for i in ascii_lowercase:
-            if word.replace(char, i) in data.keys():
+            if word.replace(char, i, 1) in data.keys():
                 score = 0
                 if index < 6:
                     score -= (5 - index % 5)
                 else:
                     score -= 1
                 score += (len(word) - 1) * 2
-                return get_data_at_key(word.replace(char, i)), score
+                return get_data_at_key(word.replace(char, i, 1)), score
 
     return [], 0
 
 
 def delete_Unnecessary_char(word):
     for index, char in enumerate(word):
-        if word.replace(char, "") in data.keys():
+        if word.replace(char, "", 1) in data.keys():
             score = 0
             if index < 5:
                 score -= 10 - index % 5
             else:
                 score -= 2
             score += (len(word) - 1) * 2
-            return get_data_at_key(word.replace(char, "")), score
+            return get_data_at_key(word.replace(char, "", 1)), score
     return [], 0
 
 
 def add_missed_char(word):
     for index, char in enumerate(word):
         for i in ascii_lowercase:
-            if word.replace(char, char + i) in data.keys():
+            if word.replace(char, char + i, 1) in data.keys():
                 score = 0
                 if index < 5:
                     score -= 10 - index % 5
                 else:
                     score -= 2
                 score += (len(word) - 1) * 2
-                return get_data_at_key(word.replace(char, char + i)), score
+                return get_data_at_key(word.replace(char, char + i, 1)), score
     return [], 0
 
 
-
-
 class AutoCompleteData:
-    def __init__(self, text_input):
-        self.completed_sentence = text_input
-        self.source_text = ""
-        self.offset = 0
-        self.score = get_five_best_sentences(text_input)[0]
+    def __init__(self, sentence):
+        self.completed_sentence = sentence
+        self.source_text = "i dont know"
+        self.offset = sent_dict[sentence]
+        self.score = 0
 
     def get_completed_sentence(self):
         return self.completed_sentence
@@ -154,31 +148,19 @@ class AutoCompleteData:
         return self.score
 
 
-# Tests:
-init_data()
-# print_data()
-# print(get_Data_at_key("to"))
-# acd = AutoCompleteData(text)
-# print(acd.get_completed_sentence("to"))
-# print(acd.replace_char("kello"))
-# print(acd.delete_Unnecessary_char("helplo"))
-# print(acd.add_missed_char("helo"))
-# print(acd.get_score("be"))
-# a = replace_char("ko")
-# b = replace_char("po")
-#
-# print(a)
-# print(b)
-# get_five_best_sentences("everyonr")
-
-# if __name__ == '__main__':
-#     print("Loading the files and preparing the system...")
-#     init_data()
-#     text = input("The system is ready, Enter your text: ")
-#     result = get_best_k_completions(text)
-#     for item in result:
-#         print(item.get_completed_sentence())
-#     print("There are suggestions")
+if __name__ == '__main__':
+    print("Loading the files and preparing the system...")
+    init_data()
+    text = input("The system is ready, Enter your text: ")
+    result = get_best_k_completions(text)
+    i = len(result)
+    print(f"There are {i} suggestions:")
+    for index, item in enumerate(result):
+        print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
 
 
-print(get_five_best_sentences("be"))
+
+
+
+
+
