@@ -52,7 +52,6 @@ def get_five_best_sentences(prefix):
     if len(best_sentences) >= 5:
         return best_sentences[:5]
     else:
-        missed_sentences = 5-len(best_sentences)
         for i in replace_char(prefix)[0]:
             best_sen[i] = replace_char(prefix)[1]
         for i in delete_Unnecessary_char(prefix)[0]:
@@ -101,9 +100,7 @@ def replace_char(word):
                 else:
                     score -= 1
                 score += (len(word) - 1) * 2
-                # return get_data_at_key(word.replace(char, i)), score
-                list1 = get_data_at_key(word.replace(char, i))
-                return list1, score
+                return get_data_at_key(word.replace(char, i)), score
 
     return [], 0
 
@@ -117,9 +114,7 @@ def delete_Unnecessary_char(word):
             else:
                 score -= 2
             score += (len(word) - 1) * 2
-            # return get_data_at_key(word.replace(char, "")), score
-            list1 = get_data_at_key(word.replace(char, ""))
-            return list1, score
+            return get_data_at_key(word.replace(char, "")), score
     return [], 0
 
 
@@ -133,9 +128,7 @@ def add_missed_char(word):
                 else:
                     score -= 2
                 score += (len(word) - 1) * 2
-                # return get_data_at_key(word.replace(char, char + i)), score
-                list1 = get_data_at_key(word.replace(char, char + i))
-                return list1, score
+                return get_data_at_key(word.replace(char, char + i)), score
     return [], 0
 
 
