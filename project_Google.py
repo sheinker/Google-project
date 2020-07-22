@@ -153,9 +153,13 @@ def add_missed_char(word):
     for index, char in enumerate(word):
         for i in ascii_lowercase:
             if word.replace(char, char + i) in data.keys():
-                # return index + 1
+                score = 0
+                if index < 5:
+                    score -= 10 - index % 5
+                else:
+                    score -= 2
+                score += (len(word) - 1) * 2
                 return get_Data_at_key(word.replace(char, char + i))
-
     return -1
 
 
