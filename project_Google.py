@@ -137,11 +137,15 @@ def replace_char(word):
 
 
 def delete_Unnecessary_char(word):
-    for char in word:
+    for index, char in enumerate(word):
         if word.replace(char, "") in data.keys():
-            # return word.index(char)
-            return get_Data_at_key(word.replace(char, ""))
-
+            score = 0
+            if index < 5:
+                score -= 10 - index % 5
+            else:
+                score -= 2
+            score += (len(word) - 1) * 2
+            return get_Data_at_key(word.replace(char, "")), score
     return -1
 
 
@@ -178,16 +182,16 @@ class AutoCompleteData:
 
 
 
-Tests:
-init_data()
-print_data()
-print(get_Data_at_key("to"))
-acd = AutoCompleteData(text)
-print(acd.get_completed_sentence("to"))
-print(acd.replace_char("kello"))
-print(acd.delete_Unnecessary_char("helplo"))
-print(acd.add_missed_char("helo"))
-print(acd.get_score("be"))
+# Tests:
+# init_data()
+# print_data()
+# print(get_Data_at_key("to"))
+# acd = AutoCompleteData(text)
+# print(acd.get_completed_sentence("to"))
+# print(acd.replace_char("kello"))
+# print(acd.delete_Unnecessary_char("helplo"))
+# print(acd.add_missed_char("helo"))
+# print(acd.get_score("be"))
 
 
 if __name__ == '__main__':
