@@ -13,21 +13,39 @@ sent_dict = {}
 bad_chars = [';', ':', '-', '!', '*', ',', '$', '@']
 
 data = defaultdict(set)
-best_sen = defaultdict(list)
-
-# def read_file(file_name):
-with open("about.txt") as file:
-    sentences_list = file.read().split("\n")
+best_sen = defaultdict(int)
 
 
-for index, item in enumerate(sentences_list):
-    sent_dict[index] = item
+class AutoCompleteData:
+    def __init__(self, sentence, source_text, offset):
+        self.completed_sentence = sentence
+        self.source_text = source_text
+        self.offset = offset
+        self.score = 0
 
+    def get_completed_sentence(self):
+        return self.completed_sentence
+
+    def get_source_text(self):
+        return self.source_text
+
+    def get_offset(self):
+        return self.offset
+
+    def get_score(self):
+        return self.score
+
+
+def read_file(file_name):
+    with open(file_name) as file:
+        sentences_list = file.read().split("\n")
+    for index1, item1 in enumerate(sentences_list):
+        sent_dict[index1] = AutoCompleteData(item1, file_name, index1)
 
 
 def init_data():
     for index, sentence in sent_dict.items():
-        substr_list = [sentence[x:y] for x, y in combinations(range(len(sentence) + 1), r=2)]
+        substr_list = [sentence.completed_sentence[x:y] for x, y in combinations(range(len(sentence.completed_sentence) + 1), r=2)]
         for substr in substr_list:
             for char in bad_chars:
                 substr = substr.replace(char, '')
@@ -45,21 +63,14 @@ def get_data_at_key(key):
     sentences = []
     for k in data[key]:
         sentences.append(sent_dict[k])
-    return sorted(sentences)
-
-
-#def read_file():
-#     file = open("demofile.txt", "r")
-#     line = file.readline()
-#
-#     file.close()
+    return sentences
 
 
 def get_five_best_sentences(sub_str):
     best_sentences = get_data_at_key(sub_str)
     if len(best_sentences) >= 5:
         for item in best_sentences:
-            best_sen[item] = 2 * len(sub_str)
+            item.score = 2 * len(sub_str)
         return best_sentences[:5]
 
     else:
@@ -74,13 +85,13 @@ def get_five_best_sentences(sub_str):
         return list(a)[:5]
 
 
-
 def get_best_k_completions(sub_str):
-    info = []
-    best_sent = get_five_best_sentences(sub_str)
-    for sentence in best_sent:
-        info.append(AutoCompleteData(sentence))
-    return info
+    # info = []
+    # best_sentences = get_five_best_sentences(sub_str)
+    # for sentence in best_sentences:
+    #     info.append()
+    # return info
+    return get_five_best_sentences(sub_str)
 
 
 # # def get_sentence_score(sentence):
@@ -144,37 +155,21 @@ def add_missed_char(word):
     return [], 0
 
 
-class AutoCompleteData:
-    def __init__(self, sentence):
-        self.completed_sentence = sentence
-        self.source_text = "about.txt"
-        self.offset = 0
-        self.score = get_sentence_score(sentence)
-
-    def get_completed_sentence(self):
-        return self.completed_sentence
-
-    def get_source_text(self):
-        return self.source_text
-
-    def get_offset(self):
-        return self.offset
-
-    def get_score(self):
-        return self.score
-
-
 if __name__ == '__main__':
     print("Loading the files and preparing the system...")
+    read_file("about.txt")
     init_data()
-    print(sent_dict)
     text = input("The system is ready, Enter your text: ")
-    result = get_best_k_completions(text)
-    i = len(result)
-    print(f"There are {i} suggestions:")
-    for index, item in enumerate(result):
-        print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
-        print(item.get_score())
+    while text != '#':
+        result = get_best_k_completions(text)
+        i = len(result)
+        print(f"There are {i} suggestions:")
+        for index, item in enumerate(result):
+            print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
+            # print(item.get_score())
+        print(text)
+        text = input()
+
 
 
 
