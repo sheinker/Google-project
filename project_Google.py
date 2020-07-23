@@ -143,7 +143,7 @@ def add_missed_char(word):
 
 if __name__ == '__main__':
     print("Loading the files and preparing the system...")
-    read_file("about.txt")
+    read_file()
     init_data()
     text = input("The system is ready, Enter your text: ")
     while text != '#':
@@ -152,7 +152,6 @@ if __name__ == '__main__':
         print(f"There are {i} suggestions:")
         for index, item in enumerate(result):
             print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
-            print(item.score)
         print(text)
         text = input()
 
