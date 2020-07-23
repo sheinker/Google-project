@@ -2,12 +2,6 @@ from itertools import combinations
 from collections import defaultdict
 from string import ascii_lowercase
 
-# sent1 = "Hello big and beautiful world "
-# sent2 = "To be or not to be, This is the question"
-# sent3 = "Be good to everyone, everywhere, everytime"
-# sent4 = "Good, better, best, never let them rest, Make the good better and the better make the best"
-# sent5 = "Bee is making honey"
-# sent6 = "We are learning in Beit - Yaakov"
 
 sent_dict = {}
 bad_chars = [';', ':', '-', '!', '*', ',', '$', '@']
@@ -86,28 +80,8 @@ def get_five_best_sentences(sub_str):
 
 
 def get_best_k_completions(sub_str):
-    # info = []
-    # best_sentences = get_five_best_sentences(sub_str)
-    # for sentence in best_sentences:
-    #     info.append()
-    # return info
     return get_five_best_sentences(sub_str)
 
-
-# # def get_sentence_score(sentence):
-#
-#
-# # return sentence with high score
-# def high_score_sentence(key):
-#     result = get_data_at_key(key)
-#     max_score = 0
-#     sent_index = 0
-#     for index, sentence in enumerate(result):
-#         score = get_sentence_score(sentence)
-#         if score > max_score:
-#             max_score = score
-#             sent_index = index
-#     return result[sent_index]
 
 def get_sentence_score(sentence):
     x = 0
@@ -165,10 +139,8 @@ if __name__ == '__main__':
         print(f"There are {i} suggestions:")
         for index, item in enumerate(result):
             print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
-            print(item.get_score())
         print(text)
         text = input()
-
 
 
 
