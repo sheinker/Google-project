@@ -21,18 +21,18 @@ with open("about.txt") as file:
 
 
 for index, item in enumerate(sentences_list):
-    sent_dict[item] = index
+    sent_dict[index] = item
 
 
 
 def init_data():
-    for sentence in sent_dict:
+    for index, sentence in sent_dict.items():
         substr_list = [sentence[x:y] for x, y in combinations(range(len(sentence) + 1), r=2)]
         for substr in substr_list:
             for char in bad_chars:
                 substr = substr.replace(char, '')
             if not substr.startswith(" ") and not substr.endswith(" "):
-                data[substr.lower()].add(sent_dict[sentence])
+                data[substr.lower()].add(index)
 
 
 def print_data():
@@ -40,14 +40,12 @@ def print_data():
         print(f'{item}: {data[item]}')
 
 
-
 def get_data_at_key(key):
     key = key.lower()
     sentences = []
     for k in data[key]:
-        sentences.append(list(sent_dict.keys())[k])
+        sentences.append(sent_dict[k])
     return sorted(sentences)
-
 
 
 #def read_file():
@@ -149,8 +147,8 @@ def add_missed_char(word):
 class AutoCompleteData:
     def __init__(self, sentence):
         self.completed_sentence = sentence
-        self.source_text = "dd"
-        self.offset = sent_dict[sentence]
+        self.source_text = "about.txt"
+        self.offset = 0
         self.score = get_sentence_score(sentence)
 
     def get_completed_sentence(self):
@@ -178,8 +176,6 @@ if __name__ == '__main__':
         print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
         print(item.get_score())
 
-# init_data()
-# print_data()
 
 
 
