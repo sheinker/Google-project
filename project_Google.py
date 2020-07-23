@@ -68,18 +68,18 @@ def get_data_at_key(key):
 
 def get_five_best_sentences(sub_str):
     best_sentences = get_data_at_key(sub_str)
+    for item in best_sentences:
+        item.score = 2 * len(sub_str)
     if len(best_sentences) >= 5:
-        for item in best_sentences:
-            item.score = 2 * len(sub_str)
         return best_sentences[:5]
 
     else:
         for i in replace_char(sub_str)[0]:
-            best_sen[i] = replace_char(sub_str)[1]
+            best_sen[i] = i.score
         for i in delete_unnecessary_char(sub_str)[0]:
-            best_sen[i] = delete_unnecessary_char(sub_str)[1]
+            best_sen[i] = i.score
         for i in add_missed_char(sub_str)[0]:
-            best_sen[i] = add_missed_char(sub_str)[1]
+            best_sen[i] = i.score
         a = set(sorted(best_sen, key=best_sen.get, reverse=True))
         a = set(best_sentences).union(a)
         return list(a)[:5]
@@ -120,25 +120,24 @@ def replace_char(word):
     for index, char in enumerate(word):
         for i in ascii_lowercase:
             if word.replace(char, i, 1) in data.keys():
-                if index < 5:
-                    score = 5 - index
-                else:
-                    score = 1
+                score = (5 - index) if index < 5 else 1
                 score = (len(word) * 2) - score
-                return get_data_at_key(word.replace(char, i, 1)), score
-
+                result = get_data_at_key(word.replace(char, i, 1))
+                for item in result:
+                    item.score = score
+                return result, score
     return [], 0
 
 
 def delete_unnecessary_char(word):
     for index, char in enumerate(word):
         if word.replace(char, "", 1) in data.keys():
-            if index < 4:
-                score = 10 - 2 * index
-            else:
-                score = 2
+            score = (10 - 2 * index) if index < 4 else 2
             score = (len(word) * 2) - score
-            return get_data_at_key(word.replace(char, "", 1)), score
+            result = get_data_at_key(word.replace(char, "", 1))
+            for item in result:
+                item.score = score
+            return result, score
     return [], 0
 
 
@@ -146,12 +145,12 @@ def add_missed_char(word):
     for index, char in enumerate(word):
         for i in ascii_lowercase:
             if word.replace(char, char + i, 1) in data.keys():
-                if index < 4:
-                    score = 10 - 2 * index
-                else:
-                    score = 2
+                score = (10 - 2 * index) if index < 4 else 2
                 score = (len(word) * 2) - score
-                return get_data_at_key(word.replace(char, char + i, 1)), score
+                result = get_data_at_key(word.replace(char, char + i, 1))
+                for item in result:
+                    item.score = score
+                return result, score
     return [], 0
 
 
@@ -166,7 +165,7 @@ if __name__ == '__main__':
         print(f"There are {i} suggestions:")
         for index, item in enumerate(result):
             print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
-            # print(item.get_score())
+            print(item.get_score())
         print(text)
         text = input()
 
