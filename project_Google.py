@@ -1,3 +1,4 @@
+import os
 from itertools import combinations
 from collections import defaultdict, OrderedDict
 from string import ascii_lowercase
@@ -30,11 +31,15 @@ class AutoCompleteData:
         return self.score
 
 
-def read_file(file_name):
-    with open(file_name) as file:
-        sentences_list = file.read().split("\n")
-    for index1, item1 in enumerate(sentences_list):
-        sent_dict[index1] = AutoCompleteData(item1, file_name, index1)
+def read_file():
+    for root, dirs, files in os.walk("./my_files/python-3.8.4-docs-text/", topdown=True):
+        for file in files:
+            if file.endswith(".txt"):
+                with open(os.path.join(root, file), encoding="utf8") as my_file:
+                    sentences_list = my_file.read().split("\n")
+                    for index1, item1 in enumerate(sentences_list):
+                        sent_dict[index1] = AutoCompleteData(item1, file, index1)
+
 
 
 def init_data():
@@ -67,26 +72,17 @@ def get_five_best_sentences(sub_str):
     if len(best_sentences) >= 5:
         return best_sentences[:5]
     else:
-        list_5_obj = []
-        replace_char(sub_str)
-        delete_unnecessary_char(sub_str)
-        add_missed_char(sub_str)
-        # for i in replace_char(sub_str)[0]:
-        #     best_sen[i] = i.score
-        # for i in delete_unnecessary_char(sub_str)[0]:
-        #     best_sen[i] = i.score
-        # for i in add_missed_char(sub_str)[0]:
-        #     best_sen[i] = i.score
-        # a = set(sorted(best_sen, key=best_sen.get, reverse=True))
-        # a = set(best_sentences).union(a)
-        # return list(a)[:5]
-        OrderedDict(sorted(score_dict.items(), key=lambda t: t[0], reverse=True))
-        for item in score_dict.keys():
-            while score_dict[item] and len(list_5_obj) < 5:
-                temp = score_dict[item].pop()
-                if temp not in list_5_obj:
-                    list_5_obj.append(temp)
-        return list_5_obj
+        for i in replace_char(sub_str):
+            best_sen[i] = i.score
+        for i in delete_unnecessary_char(sub_str):
+            best_sen[i] = i.score
+        for i in add_missed_char(sub_str):
+            best_sen[i] = i.score
+        a = set(sorted(best_sen, key=best_sen.get, reverse=False))
+        a = set(best_sentences).union(a)
+        # for item in list(a):
+        #     print(item.score)
+        return list(a)[:5]
 
 
 def get_best_k_completions(sub_str):
@@ -106,18 +102,13 @@ def replace_char(word):
             if word.replace(char, i, 1) in data.keys():
                 score = (5 - index) if index < 5 else 1
                 score = (len(word) * 2) - score
-                # result = get_data_at_key(word.replace(char, i, 1))
-                # for item in result:
-                #     item.score = score
-                # return result, score
-                # return get_data_at_key(word.replace(char, i, 1)), score
                 result = get_data_at_key(word.replace(char, i, 1))
                 for item in result:
-                    item.score = score
-                score_dict[score] = result
-                pass
-                # return score_dict
-    # return {}
+                    if item not in best_sen:
+                        item.score = score
+                return result
+                # return get_data_at_key(word.replace(char, i, 1)), score
+    return []
 
 
 def delete_unnecessary_char(word):
@@ -125,23 +116,13 @@ def delete_unnecessary_char(word):
         if word.replace(char, "", 1) in data.keys():
             score = (10 - 2 * index) if index < 4 else 2
             score = (len(word) * 2) - score
-            # result = get_data_at_key(word.replace(char, "", 1))
-            # for item in result:
-            #     item.score = score
-            # return result, score
-            # return get_data_at_key(word.replace(char, "", 1)), score
-            # result = get_data_at_key(word.replace(char, "", 1))
-            # for item in result:
-            #     score[item.score] = item.get_completed_sentence
-            # return score
             result = get_data_at_key(word.replace(char, "", 1))
             for item in result:
-                item.score = score
-            score_dict[score] = result
-            pass
-            # return score_dict
-    # return {}
-
+                if item not in best_sen:
+                    item.score = score
+            return result
+            # return get_data_at_key(word.replace(char, "", 1)), score
+    return []
 
 
 def add_missed_char(word):
@@ -150,22 +131,14 @@ def add_missed_char(word):
             if word.replace(char, char + i, 1) in data.keys():
                 score = (10 - 2 * index) if index < 4 else 2
                 score = (len(word) * 2) - score
-                # result = get_data_at_key(word.replace(char, char + i, 1))
-                # for item in result:
-                #     item.score = score
-                # return result, score
-                # return get_data_at_key(word.replace(char, char + i, 1)), score
-                # result = get_data_at_key(word.replace(char, char + i, 1))
-                # for item in result:
-                #     score[item.score] = item.get_completed_sentence
-                # return score
+                print(score)
                 result = get_data_at_key(word.replace(char, char + i, 1))
                 for item in result:
-                    item.score = score
-                score_dict[score] = result
-                pass
-            # return score_dict
-    # return {}
+                    if item not in best_sen:
+                        item.score = score
+                return result
+                # return get_data_at_key(word.replace(char, char + i, 1)), score
+    return []
 
 
 if __name__ == '__main__':
