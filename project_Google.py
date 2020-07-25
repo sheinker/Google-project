@@ -6,7 +6,6 @@ from string import ascii_lowercase
 
 sent_dict = {}
 bad_chars = [';', ':', '-', '!', '*', ',', '$', '@']
-score_dict = defaultdict()
 data = defaultdict(set)
 best_sen = defaultdict(int)
 
@@ -41,7 +40,6 @@ def read_file():
                         sent_dict[index1] = AutoCompleteData(item1, file, index1)
 
 
-
 def init_data():
     for index, sentence in sent_dict.items():
         substr_list = [sentence.completed_sentence[x:y] for x, y in combinations(range(len(sentence.completed_sentence) + 1), r=2)]
@@ -72,16 +70,17 @@ def get_five_best_sentences(sub_str):
     if len(best_sentences) >= 5:
         return best_sentences[:5]
     else:
-        for i in replace_char(sub_str):
+        result = replace_char(sub_str)
+        for i in result:
             best_sen[i] = i.score
-        for i in delete_unnecessary_char(sub_str):
+        result = delete_unnecessary_char(sub_str)
+        for i in result:
             best_sen[i] = i.score
-        for i in add_missed_char(sub_str):
+        result = add_missed_char(sub_str)
+        for i in result:
             best_sen[i] = i.score
         a = set(sorted(best_sen, key=best_sen.get, reverse=False))
         a = set(best_sentences).union(a)
-        # for item in list(a):
-        #     print(item.score)
         return list(a)[:5]
 
 
@@ -98,14 +97,17 @@ def get_sentence_score(sentence):
 
 def replace_char(word):
     for index, char in enumerate(word):
-        for i in ascii_lowercase:
-            if word.replace(char, i, 1) in data.keys():
+        for letter in ascii_lowercase:
+            new_word = word[:index] + letter + word[index+1:]
+            if new_word in data.keys():
+            # if word.replace(char, i, 1) in data.keys():
                 score = (5 - index) if index < 5 else 1
                 score = (len(word) * 2) - score
-                result = get_data_at_key(word.replace(char, i, 1))
+                result = get_data_at_key(new_word)
                 for item in result:
                     if item not in best_sen:
                         item.score = score
+                        score = 0
                 return result
                 # return get_data_at_key(word.replace(char, i, 1)), score
     return []
@@ -113,13 +115,16 @@ def replace_char(word):
 
 def delete_unnecessary_char(word):
     for index, char in enumerate(word):
-        if word.replace(char, "", 1) in data.keys():
+        new_word = word[:index] +  word[index + 1:]
+        if new_word in data.keys():
+        # if word.replace(char, "", 1) in data.keys():
             score = (10 - 2 * index) if index < 4 else 2
             score = (len(word) * 2) - score
-            result = get_data_at_key(word.replace(char, "", 1))
+            result = get_data_at_key(new_word)
             for item in result:
                 if item not in best_sen:
                     item.score = score
+                    score = 0
             return result
             # return get_data_at_key(word.replace(char, "", 1)), score
     return []
@@ -127,15 +132,18 @@ def delete_unnecessary_char(word):
 
 def add_missed_char(word):
     for index, char in enumerate(word):
-        for i in ascii_lowercase:
-            if word.replace(char, char + i, 1) in data.keys():
+        for letter in ascii_lowercase:
+            new_word = word[:index] + letter + word[index:]
+            if new_word in data.keys():
+            # if word.replace(char, char + i, 1) in data.keys():
                 score = (10 - 2 * index) if index < 4 else 2
                 score = (len(word) * 2) - score
                 print(score)
-                result = get_data_at_key(word.replace(char, char + i, 1))
+                result = get_data_at_key(new_word)
                 for item in result:
                     if item not in best_sen:
                         item.score = score
+                        score = 0
                 return result
                 # return get_data_at_key(word.replace(char, char + i, 1)), score
     return []
@@ -152,6 +160,7 @@ if __name__ == '__main__':
         print(f"There are {i} suggestions:")
         for index, item in enumerate(result):
             print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
+            print(item.score)
         print(text)
         text = input()
 
