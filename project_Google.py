@@ -84,6 +84,7 @@ def get_five_best_sentences(sub_str):
             best_sen[i] = i.score
         a = set(sorted(best_sen, key=best_sen.get, reverse=False))
         a = set(best_sentences).union(a)
+
         return list(a)[:5]
 
 
@@ -161,7 +162,6 @@ if __name__ == '__main__':
         print(f"There are {i} suggestions:")
         for index, item in enumerate(result):
             print(f'{index + 1}. {item.get_completed_sentence()} ({item.get_source_text()} {item.get_offset()})')
-            print(item.score)
         print(text, end="")
         text += input()
 
